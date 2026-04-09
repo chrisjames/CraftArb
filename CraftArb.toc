@@ -1,0 +1,9 @@
+## Interface: 11200
+## Title: CraftArb
+## Notes: Crafting arbitrage scanner for the Auction House
+## Author: Chris
+## Version: 0.1
+## SavedVariables: CraftArbDB
+
+CraftArb.xml
+CraftArb.lua

@@ -1,0 +1,122 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+  <!-- Invisible event listener frame, created at startup -->
+  <Frame name="CraftArbEventFrame" hidden="true">
+    <Scripts>
+      <OnLoad>
+        CraftArb_OnLoad(this)
+      </OnLoad>
+      <OnEvent>
+        CraftArb_OnEvent(this, event)
+      </OnEvent>
+    </Scripts>
+  </Frame>
+
+  <!-- Main panel window -->
+  <Frame name="CraftArbFrame" parent="UIParent"
+         frameStrata="MEDIUM" movable="true" enableMouse="true"
+         hidden="true" toplevel="true">
+    <Size>
+      <AbsDimension x="420" y="320"/>
+    </Size>
+    <Anchors>
+      <Anchor point="CENTER"/>
+    </Anchors>
+    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background"
+              edgeFile="Interface\DialogFrame\UI-DialogBox-Border"
+              tile="true">
+      <BackgroundInsets>
+        <AbsInset left="11" right="12" top="12" bottom="11"/>
+      </BackgroundInsets>
+      <TileSize>
+        <AbsValue val="32"/>
+      </TileSize>
+      <EdgeSize>
+        <AbsValue val="32"/>
+      </EdgeSize>
+    </Backdrop>
+    <Scripts>
+      <OnMouseDown>
+        this:StartMoving()
+      </OnMouseDown>
+      <OnMouseUp>
+        this:StopMovingOrSizing()
+      </OnMouseUp>
+    </Scripts>
+
+    <!-- Title bar -->
+    <Frames>
+      <Frame name="CraftArbTitleBar" parent="CraftArbFrame">
+        <Size><AbsDimension x="420" y="24"/></Size>
+        <Anchors><Anchor point="TOPLEFT" x="0" y="0"/></Anchors>
+        <Layers>
+          <Layer level="ARTWORK">
+            <FontString name="CraftArbTitle" inherits="GameFontNormal"
+                        text="CraftArb — Crafting Arbitrage">
+              <Anchors><Anchor point="CENTER" x="0" y="0"/></Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+      </Frame>
+
+      <!-- Close button -->
+      <Button name="CraftArbCloseButton" parent="CraftArbFrame"
+              inherits="UIPanelCloseButton">
+        <Anchors>
+          <Anchor point="TOPRIGHT" x="-4" y="-4"/>
+        </Anchors>
+        <Scripts>
+          <OnClick>
+            CraftArbFrame:Hide()
+          </OnClick>
+        </Scripts>
+      </Button>
+
+      <!-- Status text (shown below title) -->
+      <Frame name="CraftArbStatusFrame" parent="CraftArbFrame">
+        <Size><AbsDimension x="400" y="20"/></Size>
+        <Anchors><Anchor point="TOPLEFT" x="14" y="-28"/></Anchors>
+        <Layers>
+          <Layer level="ARTWORK">
+            <FontString name="CraftArbStatusText" inherits="GameFontNormalSmall"
+                        text="Ready. Open the Auction House, then click Scan.">
+              <Anchors><Anchor point="LEFT" x="0" y="0"/></Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+      </Frame>
+
+      <!-- Scan button -->
+      <Button name="CraftArbScanButton" parent="CraftArbFrame"
+              inherits="UIPanelButtonTemplate" text="Scan AH">
+        <Size><AbsDimension x="90" y="22"/></Size>
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" x="14" y="14"/>
+        </Anchors>
+        <Scripts>
+          <OnClick>
+            CraftArb_StartScan()
+          </OnClick>
+        </Scripts>
+      </Button>
+
+      <!-- Show Deals button -->
+      <Button name="CraftArbDealsButton" parent="CraftArbFrame"
+              inherits="UIPanelButtonTemplate" text="Show Deals">
+        <Size><AbsDimension x="90" y="22"/></Size>
+        <Anchors>
+          <Anchor point="BOTTOMLEFT" x="112" y="14"/>
+        </Anchors>
+        <Scripts>
+          <OnClick>
+            CraftArb_ShowDeals()
+          </OnClick>
+        </Scripts>
+      </Button>
+
+    </Frames>
+  </Frame>
+
+</Ui>
