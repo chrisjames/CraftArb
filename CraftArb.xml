@@ -77,7 +77,7 @@
       <!-- Status text (shown below title) -->
       <Frame name="CraftArbStatusFrame" parent="CraftArbFrame">
         <Size><AbsDimension x="400" y="20"/></Size>
-        <Anchors><Anchor point="TOPLEFT" x="14" y="-28"/></Anchors>
+        <Anchors><Anchor point="TOPLEFT" x="14" y="-44"/></Anchors>
         <Layers>
           <Layer level="ARTWORK">
             <FontString name="CraftArbStatusText" inherits="GameFontNormalSmall"
