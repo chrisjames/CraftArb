@@ -5,5 +5,5 @@
 ## Version: 0.1
 ## SavedVariables: CraftArbDB
 
-CraftArb.xml
 CraftArb.lua
+CraftArb.xml
