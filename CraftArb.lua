@@ -18,13 +18,13 @@ local VERSION    = "0.1"
 
 function CraftArb_OnLoad(frame)
   -- Register for the events we care about at startup
-  frame:RegisterEvent("ADDON_LOADED")
+  frame:RegisterEvent("VARIABLES_LOADED")  -- ADDON_LOADED does not exist in vanilla 1.12
   frame:RegisterEvent("AUCTION_HOUSE_SHOW")
   frame:RegisterEvent("AUCTION_HOUSE_CLOSED")
 end
 
 function CraftArb_OnEvent(frame, event)
-  if event == "ADDON_LOADED" then
+  if event == "VARIABLES_LOADED" then
     CraftArb_Init()
   elseif event == "AUCTION_HOUSE_SHOW" then
     CraftArb_OnAHShow()
