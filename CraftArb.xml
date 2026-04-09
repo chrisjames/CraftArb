@@ -107,7 +107,7 @@
               inherits="UIPanelButtonTemplate" text="Show Deals">
         <Size><AbsDimension x="110" y="22"/></Size>
         <Anchors>
-          <Anchor point="BOTTOMLEFT" x="160" y="14"/>
+          <Anchor point="LEFT" relativeTo="CraftArbScanButton" relativePoint="RIGHT" x="16" y="0"/>
         </Anchors>
         <Scripts>
           <OnClick>
