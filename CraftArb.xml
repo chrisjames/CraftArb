@@ -91,7 +91,7 @@
       <!-- Scan button -->
       <Button name="CraftArbScanButton" parent="CraftArbFrame"
               inherits="UIPanelButtonTemplate" text="Scan AH">
-        <Size><AbsDimension x="90" y="22"/></Size>
+        <Size><AbsDimension x="100" y="22"/></Size>
         <Anchors>
           <Anchor point="BOTTOMLEFT" x="14" y="14"/>
         </Anchors>
@@ -105,9 +105,9 @@
       <!-- Show Deals button -->
       <Button name="CraftArbDealsButton" parent="CraftArbFrame"
               inherits="UIPanelButtonTemplate" text="Show Deals">
-        <Size><AbsDimension x="100" y="22"/></Size>
+        <Size><AbsDimension x="110" y="22"/></Size>
         <Anchors>
-          <Anchor point="BOTTOMLEFT" x="120" y="14"/>
+          <Anchor point="BOTTOMLEFT" x="160" y="14"/>
         </Anchors>
         <Scripts>
           <OnClick>
