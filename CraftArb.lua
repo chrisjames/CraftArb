@@ -15,31 +15,10 @@ local VERSION = "0.1"
 -- ---------------------------------------------------------------------------
 
 CraftArb_ItemNames = {
-  -- Ores
-  [2770]  = "Copper Ore",
-  [2771]  = "Tin Ore",
-  [2772]  = "Iron Ore",
-  [2776]  = "Gold Ore",
-  [3858]  = "Mithril Ore",
-  [7911]  = "Truesilver Ore",
-  [10620] = "Thorium Ore",
-  -- Bars
-  [2840]  = "Copper Bar",
-  [3576]  = "Tin Bar",
-  [2841]  = "Bronze Bar",
-  [3575]  = "Iron Bar",
-  [3577]  = "Gold Bar",
-  [3860]  = "Mithril Bar",
-  [6037]  = "Truesilver Bar",
-  [12359] = "Thorium Bar",
   -- Fish
-  [6303]  = "Raw Oily Blackmouth",
-  [13422] = "Stonescale Eel",
   [13439] = "Raw Nightfin Snapper",
   [21153] = "Raw Sagefish",
   -- Cooked outputs
-  [6370]  = "Blackmouth Oil",
-  [13423] = "Stonescale Oil",
   [13931] = "Nightfin Soup",
   [21217] = "Sagefish Delight",
 }
@@ -49,20 +28,9 @@ CraftArb_ItemNames = {
 -- ---------------------------------------------------------------------------
 
 CraftArb_Recipes = {
-  -- Mining: ore -> bars
-  { name = "Copper Bar",     output = { id = 2840,  qty = 1 }, mats = { { id = 2770,  qty = 2 } } },
-  { name = "Tin Bar",        output = { id = 3576,  qty = 1 }, mats = { { id = 2771,  qty = 2 } } },
-  { name = "Bronze Bar",     output = { id = 2841,  qty = 2 }, mats = { { id = 2770,  qty = 1 }, { id = 2771, qty = 1 } } },
-  { name = "Iron Bar",       output = { id = 3575,  qty = 1 }, mats = { { id = 2772,  qty = 2 } } },
-  { name = "Gold Bar",       output = { id = 3577,  qty = 1 }, mats = { { id = 2776,  qty = 2 } } },
-  { name = "Mithril Bar",    output = { id = 3860,  qty = 1 }, mats = { { id = 3858,  qty = 2 } } },
-  { name = "Truesilver Bar", output = { id = 6037,  qty = 1 }, mats = { { id = 7911,  qty = 2 } } },
-  { name = "Thorium Bar",    output = { id = 12359, qty = 1 }, mats = { { id = 10620, qty = 2 } } },
   -- Cooking: raw fish -> processed outputs
-  { name = "Blackmouth Oil",    output = { id = 6370,  qty = 1 }, mats = { { id = 6303,  qty = 1 } } },
-  { name = "Stonescale Oil",    output = { id = 13423, qty = 1 }, mats = { { id = 13422, qty = 1 } } },
-  { name = "Nightfin Soup",     output = { id = 13931, qty = 1 }, mats = { { id = 13439, qty = 1 } } },
-  { name = "Sagefish Delight",  output = { id = 21217, qty = 1 }, mats = { { id = 21153, qty = 2 } } },
+  { name = "Nightfin Soup",    output = { id = 13931, qty = 1 }, mats = { { id = 13439, qty = 1 } } },
+  { name = "Sagefish Delight", output = { id = 21217, qty = 1 }, mats = { { id = 21153, qty = 2 } } },
 }
 
 -- Build deduplicated scan list from all recipe item IDs
