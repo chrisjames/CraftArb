@@ -88,12 +88,13 @@ end
 -- ---------------------------------------------------------------------------
 
 CraftArb_Scan = {
-  active   = false,
-  queue    = {},   -- item IDs left to query
-  total    = 0,    -- total items at scan start (for progress display)
-  current  = nil,  -- item ID currently being queried
-  waiting  = false, -- true while waiting for AUCTION_ITEM_LIST_UPDATE
-  queryTime = 0,   -- GetTime() when last query was sent (for timeout)
+  active    = false,
+  queue     = {},   -- item IDs left to query
+  total     = 0,    -- total items at scan start (for progress display)
+  current   = nil,  -- item ID currently being queried
+  page      = 0,    -- current AH page being queried (0-indexed)
+  waiting   = false, -- true while waiting for AUCTION_ITEM_LIST_UPDATE
+  queryTime = 0,    -- GetTime() when last query was sent (for timeout)
 }
 
 function CraftArb_StartScan()
@@ -107,10 +108,11 @@ function CraftArb_StartScan()
   for _, id in ipairs(CraftArb_ScanItems) do
     table.insert(CraftArb_Scan.queue, id)
   end
-  CraftArb_Scan.total    = table.getn(CraftArb_Scan.queue)
-  CraftArb_Scan.active   = true
-  CraftArb_Scan.waiting  = false
-  CraftArb_Scan.current  = nil
+  CraftArb_Scan.total     = table.getn(CraftArb_Scan.queue)
+  CraftArb_Scan.active    = true
+  CraftArb_Scan.waiting   = false
+  CraftArb_Scan.current   = nil
+  CraftArb_Scan.page      = 0
   CraftArb_Scan.queryTime = 0
 
   CraftArbStatusText:SetText("Starting scan...")
@@ -133,8 +135,8 @@ function CraftArb_OnUpdate(elapsed)
     end
   end
 
-  -- All items done?
-  if table.getn(CraftArb_Scan.queue) == 0 then
+  -- All items done? (only if we're not still paginating the current item)
+  if table.getn(CraftArb_Scan.queue) == 0 and not CraftArb_Scan.current then
     CraftArb_ScanComplete()
     return
   end
@@ -142,18 +144,22 @@ function CraftArb_OnUpdate(elapsed)
   -- Wait until server is ready for next query
   if not CanSendAuctionQuery() then return end
 
-  -- Pop next item and query AH
-  CraftArb_Scan.current = table.remove(CraftArb_Scan.queue, 1)
+  -- If current is still set, we're paginating — don't pop a new item
+  if not CraftArb_Scan.current then
+    CraftArb_Scan.current = table.remove(CraftArb_Scan.queue, 1)
+    CraftArb_Scan.page    = 0
+  end
+
   local name = CraftArb_ItemNames[CraftArb_Scan.current]
   if not name then
-    -- Unknown item - skip immediately
     CraftArb_Scan.current = nil
+    CraftArb_Scan.page    = 0
     return
   end
 
   local done = CraftArb_Scan.total - table.getn(CraftArb_Scan.queue)
-  CraftArbStatusText:SetText("Scanning " .. done .. "/" .. CraftArb_Scan.total .. ": " .. name)
-  QueryAuctionItems(name, nil, nil, nil, nil, nil, 0, nil, nil)
+  CraftArbStatusText:SetText("Scanning " .. done .. "/" .. CraftArb_Scan.total .. ": " .. name .. " (p" .. CraftArb_Scan.page + 1 .. ")")
+  QueryAuctionItems(name, nil, nil, nil, nil, nil, CraftArb_Scan.page, nil, nil)
   CraftArb_Scan.waiting   = true
   CraftArb_Scan.queryTime = GetTime()
 end
@@ -162,31 +168,43 @@ end
 function CraftArb_OnAuctionListUpdate()
   if not CraftArb_Scan.active or not CraftArb_Scan.current then return end
 
-  local itemId = CraftArb_Scan.current
-  local count  = GetNumAuctionItems("list")
-  local minPerUnit = nil
+  local itemId   = CraftArb_Scan.current
+  local count    = GetNumAuctionItems("list")
+  local existing = CraftArbDB.prices[itemId] and CraftArbDB.prices[itemId].min or nil
 
   for i = 1, count do
     local _, _, stackSize, _, _, _, _, _, buyout = GetAuctionItemInfo("list", i)
     local link = GetAuctionItemLink("list", i)
     if link and buyout and buyout > 0 and stackSize and stackSize > 0 then
-      -- Parse item ID from link format: |Hitem:ITEMID:...|h
       local _, _, linkId = string.find(link, "|Hitem:(%d+):")
       if tonumber(linkId) == itemId then
         local perUnit = buyout / stackSize
-        if not minPerUnit or perUnit < minPerUnit then
-          minPerUnit = perUnit
+        if not existing or perUnit < existing then
+          existing = perUnit
         end
       end
     end
   end
 
-  if minPerUnit then
-    CraftArbDB.prices[itemId] = { min = minPerUnit }
+  if existing then
+    CraftArbDB.prices[itemId] = { min = existing }
   end
 
-  CraftArb_Scan.waiting = false
-  CraftArb_Scan.current = nil
+  -- If we got a full page (50 results), there may be more pages
+  if count == 50 then
+    CraftArb_Scan.page    = CraftArb_Scan.page + 1
+    CraftArb_Scan.waiting = false  -- OnUpdate will send next page when CanSendAuctionQuery
+    -- Signal OnUpdate to query next page rather than next item
+    -- by leaving CraftArb_Scan.current set
+    local name = CraftArb_ItemNames[itemId]
+    local done = CraftArb_Scan.total - table.getn(CraftArb_Scan.queue)
+    CraftArbStatusText:SetText("Scanning " .. done .. "/" .. CraftArb_Scan.total .. ": " .. name .. " (p" .. CraftArb_Scan.page + 1 .. ")")
+  else
+    -- Partial page means we've seen all listings for this item
+    CraftArb_Scan.waiting = false
+    CraftArb_Scan.current = nil
+    CraftArb_Scan.page    = 0
+  end
 end
 
 function CraftArb_ScanComplete()
