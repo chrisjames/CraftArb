@@ -267,8 +267,8 @@ function CraftArb_PrintPrices()
   for id, data in pairs(CraftArbDB.prices) do
     local name = CraftArb_ItemNames[id] or ("Item " .. id)
     local gold   = math.floor(data.min / 10000)
-    local silver = math.floor((data.min % 10000) / 100)
-    local copper = math.floor(data.min % 100)
+    local silver = math.floor(math.mod(data.min, 10000) / 100)
+    local copper = math.floor(math.mod(data.min, 100))
     DEFAULT_CHAT_FRAME:AddMessage(
       string.format("  %s: %dg %ds %dc", name, gold, silver, copper)
     )
