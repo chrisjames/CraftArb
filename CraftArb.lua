@@ -14,7 +14,7 @@ local VERSION = "0.1"
 -- Verify IDs in-game: /script print(GetItemInfo(itemId))
 -- ---------------------------------------------------------------------------
 
-local ITEM_NAMES = {
+CraftArb_ItemNames = {
   -- Ores
   [2770]  = "Copper Ore",
   [2771]  = "Tin Ore",
@@ -87,7 +87,7 @@ end
 -- Scan state machine (not persisted)
 -- ---------------------------------------------------------------------------
 
-local Scan = {
+CraftArb_Scan = {
   active   = false,
   queue    = {},   -- item IDs left to query
   total    = 0,    -- total items at scan start (for progress display)
@@ -103,52 +103,52 @@ function CraftArb_StartScan()
     return
   end
 
-  Scan.queue   = {}
+  CraftArb_Scan.queue   = {}
   for _, id in ipairs(CraftArb_ScanItems) do
-    table.insert(Scan.queue, id)
+    table.insert(CraftArb_Scan.queue, id)
   end
-  Scan.total   = table.getn(Scan.queue)
-  Scan.active  = true
-  Scan.timer   = 0    -- fire first query immediately
-  Scan.waiting = false
-  Scan.current = nil
+  CraftArb_Scan.total   = table.getn(CraftArb_Scan.queue)
+  CraftArb_Scan.active  = true
+  CraftArb_Scan.timer   = 0    -- fire first query immediately
+  CraftArb_Scan.waiting = false
+  CraftArb_Scan.current = nil
 
   CraftArbStatusText:SetText("Starting scan...")
-  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r Scanning " .. Scan.total .. " items...")
+  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r Scanning " .. CraftArb_Scan.total .. " items...")
 end
 
 -- Called every frame by CraftArbEventFrame OnUpdate
 function CraftArb_OnUpdate(elapsed)
-  if not Scan.active or Scan.waiting then return end
+  if not CraftArb_Scan.active or CraftArb_Scan.waiting then return end
 
-  Scan.timer = Scan.timer - elapsed
-  if Scan.timer > 0 then return end
+  CraftArb_Scan.timer = CraftArb_Scan.timer - elapsed
+  if CraftArb_Scan.timer > 0 then return end
 
   -- All items done?
-  if table.getn(Scan.queue) == 0 then
+  if table.getn(CraftArb_Scan.queue) == 0 then
     CraftArb_ScanComplete()
     return
   end
 
   -- Pop next item and query AH
-  Scan.current = table.remove(Scan.queue, 1)
-  local name = ITEM_NAMES[Scan.current]
+  CraftArb_Scan.current = table.remove(CraftArb_Scan.queue, 1)
+  local name = CraftArb_ItemNames[CraftArb_Scan.current]
   if not name then
     -- Unknown item - skip without delay
     return
   end
 
-  local done = Scan.total - table.getn(Scan.queue)
-  CraftArbStatusText:SetText("Scanning " .. done .. "/" .. Scan.total .. ": " .. name)
+  local done = CraftArb_Scan.total - table.getn(CraftArb_Scan.queue)
+  CraftArbStatusText:SetText("Scanning " .. done .. "/" .. CraftArb_Scan.total .. ": " .. name)
   QueryAuctionItems(name, nil, nil, nil, nil, nil, 0, nil, nil)
-  Scan.waiting = true
+  CraftArb_Scan.waiting = true
 end
 
 -- Called when AH returns results for the current query
 function CraftArb_OnAuctionListUpdate()
-  if not Scan.active or not Scan.current then return end
+  if not CraftArb_Scan.active or not CraftArb_Scan.current then return end
 
-  local itemId = Scan.current
+  local itemId = CraftArb_Scan.current
   local count  = GetNumAuctionItems("list")
   local minPerUnit = nil
 
@@ -172,13 +172,13 @@ function CraftArb_OnAuctionListUpdate()
   end
 
   -- Wait 1.5s before next query
-  Scan.waiting = false
-  Scan.timer   = 1.5
+  CraftArb_Scan.waiting = false
+  CraftArb_Scan.timer   = 1.5
 end
 
 function CraftArb_ScanComplete()
-  Scan.active  = false
-  Scan.current = nil
+  CraftArb_Scan.active  = false
+  CraftArb_Scan.current = nil
   CraftArbStatusText:SetText("Scan complete! Click Show Deals.")
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r Scan complete.")
 end
@@ -265,7 +265,7 @@ end
 function CraftArb_PrintPrices()
   local count = 0
   for id, data in pairs(CraftArbDB.prices) do
-    local name = ITEM_NAMES[id] or ("Item " .. id)
+    local name = CraftArb_ItemNames[id] or ("Item " .. id)
     local gold   = math.floor(data.min / 10000)
     local silver = math.floor((data.min % 10000) / 100)
     local copper = math.floor(data.min % 100)
@@ -302,9 +302,9 @@ function CraftArb_OnAHShow()
 end
 
 function CraftArb_OnAHClose()
-  if Scan.active then
-    Scan.active  = false
-    Scan.waiting = false
+  if CraftArb_Scan.active then
+    CraftArb_Scan.active  = false
+    CraftArb_Scan.waiting = false
     CraftArbStatusText:SetText("Scan cancelled - AH closed.")
     DEFAULT_CHAT_FRAME:AddMessage("|cffff4444CraftArb:|r Scan cancelled - AH closed.")
   else
