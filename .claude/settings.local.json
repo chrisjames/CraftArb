@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Games/TurtleWoW/**)",
+      "Read(//c/Games/TurtleWoW/Logs/**)",
+      "Bash(xargs grep:*)",
+      "Bash(grep -n \"function M.signal\\\\|function signal\\\\|function M.later\\\\|function later\" /c/Games/TurtleWoW/Interface/AddOns/aux-addon/*.lua /c/Games/TurtleWoW/Interface/AddOns/aux-addon/**/*.lua)"
+    ]
+  }
+}

@@ -79,6 +79,34 @@
         </Layers>
       </Frame>
 
+      <!-- Column headers -->
+      <Frame name="CraftArbHeaderFrame" parent="CraftArbFrame">
+        <Size><AbsDimension x="388" y="14"/></Size>
+        <Anchors><Anchor point="TOPLEFT" x="16" y="-36"/></Anchors>
+        <Layers>
+          <Layer level="ARTWORK">
+            <FontString inherits="GameFontNormalSmall" text="Recipe">
+              <Anchors><Anchor point="LEFT" x="0" y="0"/></Anchors>
+            </FontString>
+            <FontString inherits="GameFontNormalSmall" text="Mat Cost">
+              <Anchors><Anchor point="LEFT" x="156" y="0"/></Anchors>
+            </FontString>
+            <FontString inherits="GameFontNormalSmall" text="Sell Price">
+              <Anchors><Anchor point="LEFT" x="234" y="0"/></Anchors>
+            </FontString>
+            <FontString inherits="GameFontNormalSmall" text="Profit">
+              <Anchors><Anchor point="LEFT" x="312" y="0"/></Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+      </Frame>
+
+      <!-- Deals list area (rows created dynamically from Lua) -->
+      <Frame name="CraftArbDealsArea" parent="CraftArbFrame">
+        <Size><AbsDimension x="388" y="218"/></Size>
+        <Anchors><Anchor point="TOPLEFT" x="16" y="-54"/></Anchors>
+      </Frame>
+
       <!-- Scan button -->
       <Button name="CraftArbScanButton" parent="CraftArbFrame"
               inherits="UIPanelButtonTemplate" text="Scan AH">

@@ -344,16 +344,186 @@ function CraftArb_OnAHClose()
 end
 
 -- ---------------------------------------------------------------------------
--- Show Deals (stub - profit calc comes in next stage)
+-- Money formatting
+-- ---------------------------------------------------------------------------
+
+function CraftArb_FormatMoney(copper)
+  if not copper then return "---" end
+  copper = math.floor(copper)
+  local g = math.floor(copper / 10000)
+  local s = math.floor(math.mod(copper, 10000) / 100)
+  local c = math.floor(math.mod(copper, 100))
+  if g > 0 then
+    return string.format("%dg %ds %dc", g, s, c)
+  elseif s > 0 then
+    return string.format("%ds %dc", s, c)
+  else
+    return string.format("%dc", c)
+  end
+end
+
+-- ---------------------------------------------------------------------------
+-- Deals calculation
+-- ---------------------------------------------------------------------------
+
+-- Returns a list of deal tables, sorted: profitable first (desc profit),
+-- then unprofitable-with-data (desc profit), then no-data entries.
+function CraftArb_CalcDeals()
+  local deals = {}
+  for _, recipe in ipairs(CraftArb_Recipes) do
+    local matCost   = 0
+    local hasAllMats = true
+    local hasOutput  = false
+
+    for _, mat in ipairs(recipe.mats) do
+      local p = CraftArbDB.prices[mat.id]
+      if p and p.min then
+        matCost = matCost + p.min * mat.qty
+      else
+        hasAllMats = false
+        break
+      end
+    end
+
+    local outP = CraftArbDB.prices[recipe.output.id]
+    if outP and outP.min then hasOutput = true end
+
+    if hasAllMats and hasOutput then
+      local sellGross = outP.min * recipe.output.qty
+      -- 5% AH cut applied to gross sell; integer arithmetic to avoid floats
+      local revenue = math.floor(sellGross * 95 / 100)
+      local profit  = revenue - matCost
+      table.insert(deals, {
+        name      = recipe.name,
+        matCost   = matCost,
+        sellGross = sellGross,
+        profit    = profit,
+        hasData   = true,
+      })
+    else
+      table.insert(deals, {
+        name    = recipe.name,
+        hasData = false,
+      })
+    end
+  end
+
+  table.sort(deals, function(a, b)
+    if a.hasData and b.hasData then
+      return a.profit > b.profit
+    elseif a.hasData then
+      return true
+    elseif b.hasData then
+      return false
+    else
+      return false
+    end
+  end)
+
+  return deals
+end
+
+-- ---------------------------------------------------------------------------
+-- Deals UI rows (created lazily, parented to CraftArbDealsArea)
+-- ---------------------------------------------------------------------------
+
+CraftArb_DealsRows = {}
+
+function CraftArb_GetRow(index)
+  if CraftArb_DealsRows[index] then return CraftArb_DealsRows[index] end
+
+  local row = CreateFrame("Frame", nil, CraftArbDealsArea)
+  row:SetHeight(16)
+  row:SetWidth(388)
+  row:SetPoint("TOPLEFT", 0, -(index - 1) * 16)
+
+  local nameText = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+  nameText:SetWidth(156)
+  nameText:SetPoint("LEFT", row, "LEFT", 0, 0)
+  nameText:SetJustifyH("LEFT")
+  row.nameText = nameText
+
+  local matText = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+  matText:SetWidth(76)
+  matText:SetPoint("LEFT", row, "LEFT", 156, 0)
+  matText:SetJustifyH("RIGHT")
+  row.matText = matText
+
+  local sellText = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+  sellText:SetWidth(76)
+  sellText:SetPoint("LEFT", row, "LEFT", 234, 0)
+  sellText:SetJustifyH("RIGHT")
+  row.sellText = sellText
+
+  local profitText = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+  profitText:SetWidth(76)
+  profitText:SetPoint("LEFT", row, "LEFT", 312, 0)
+  profitText:SetJustifyH("RIGHT")
+  row.profitText = profitText
+
+  CraftArb_DealsRows[index] = row
+  return row
+end
+
+-- ---------------------------------------------------------------------------
+-- Show Deals
 -- ---------------------------------------------------------------------------
 
 function CraftArb_ShowDeals()
-  local count = 0
-  for _ in pairs(CraftArbDB.prices) do count = count + 1 end
-  if count == 0 then
+  -- Hide all cached rows first
+  for _, row in ipairs(CraftArb_DealsRows) do
+    row:Hide()
+  end
+
+  local priceCount = 0
+  for _ in pairs(CraftArbDB.prices) do priceCount = priceCount + 1 end
+  if priceCount == 0 then
     CraftArbStatusText:SetText("No scan data. Run a scan first.")
+    return
+  end
+
+  local deals = CraftArb_CalcDeals()
+  local profitableCount = 0
+  for _, d in ipairs(deals) do
+    if d.hasData and d.profit >= CraftArbDB.minProfit then
+      profitableCount = profitableCount + 1
+    end
+  end
+
+  for i, deal in ipairs(deals) do
+    local row = CraftArb_GetRow(i)
+
+    if not deal.hasData then
+      row.nameText:SetText("|cff888888" .. deal.name .. "|r")
+      row.matText:SetText("|cff888888---|r")
+      row.sellText:SetText("|cff888888---|r")
+      row.profitText:SetText("|cff888888no data|r")
+    elseif deal.profit < CraftArbDB.minProfit then
+      local profitStr
+      if deal.profit >= 0 then
+        profitStr = "|cff888888" .. CraftArb_FormatMoney(deal.profit) .. "|r"
+      else
+        profitStr = "|cffff4444-" .. CraftArb_FormatMoney(-deal.profit) .. "|r"
+      end
+      row.nameText:SetText("|cff888888" .. deal.name .. "|r")
+      row.matText:SetText("|cff888888" .. CraftArb_FormatMoney(deal.matCost) .. "|r")
+      row.sellText:SetText("|cff888888" .. CraftArb_FormatMoney(deal.sellGross) .. "|r")
+      row.profitText:SetText(profitStr)
+    else
+      row.nameText:SetText(deal.name)
+      row.matText:SetText(CraftArb_FormatMoney(deal.matCost))
+      row.sellText:SetText(CraftArb_FormatMoney(deal.sellGross))
+      row.profitText:SetText("|cff00ff00" .. CraftArb_FormatMoney(deal.profit) .. "|r")
+    end
+
+    row:Show()
+  end
+
+  if profitableCount == 0 then
+    CraftArbStatusText:SetText("No profitable deals (min: " .. CraftArb_FormatMoney(CraftArbDB.minProfit) .. ")")
+  elseif profitableCount == 1 then
+    CraftArbStatusText:SetText("1 profitable deal found.")
   else
-    CraftArbStatusText:SetText("Deals coming soon! (" .. count .. " prices stored)")
-    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r " .. count .. " prices stored. Use /craftarb prices to inspect.")
+    CraftArbStatusText:SetText(profitableCount .. " profitable deals found.")
   end
 end
