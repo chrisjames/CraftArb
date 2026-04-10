@@ -16,8 +16,8 @@ local VERSION = "0.1"
 
 CraftArb_ItemNames = {
   -- Fish
-  [13439] = "Raw Nightfin Snapper",
-  [21154] = "Raw Greater Sagefish",  -- verify in-game: /script print(GetItemInfo(21154))
+  [13759] = "Raw Nightfin Snapper",
+  [21153] = "Raw Greater Sagefish",
   -- Cooked outputs
   [13931] = "Nightfin Soup",
   [21217] = "Sagefish Delight",
@@ -31,10 +31,8 @@ CraftArb_ItemNames = {
 CraftArb_Recipes = {
   -- Cooking: raw fish -> processed outputs
   -- Nightfin Soup: 1x Raw Nightfin Snapper + 1x Refreshing Spring Water (4c vendor)
-  { name = "Nightfin Soup",    output = { id = 13931, qty = 1 }, mats = { { id = 13439, qty = 1 } }, vendorCost = 4  },
-  -- Sagefish Delight: 1x Raw Greater Sagefish + 1x Hot Spices (36c vendor)
-  -- verify in-game: /script print(GetItemInfo(21154))
-  { name = "Sagefish Delight", output = { id = 21217, qty = 1 }, mats = { { id = 21154, qty = 1 } }, vendorCost = 36 },
+  { name = "Nightfin Soup",    output = { id = 13931, qty = 1 }, mats = { { id = 13759, qty = 1 } }, vendorCost = 4  },
+  { name = "Sagefish Delight", output = { id = 21217, qty = 1 }, mats = { { id = 21153, qty = 1 } }, vendorCost = 36 },
 }
 
 -- Build deduplicated scan list from all recipe item IDs
@@ -429,7 +427,7 @@ function CraftArb_GetRow(index)
   local row = CreateFrame("Frame", nil, CraftArbDealsArea)
   row:SetHeight(16)
   row:SetWidth(388)
-  row:SetPoint("TOPLEFT", 0, -(index - 1) * 16)
+  row:SetPoint("TOPLEFT", CraftArbDealsArea, "TOPLEFT", 0, -(index - 1) * 16)
 
   local nameText = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
   nameText:SetWidth(156)
