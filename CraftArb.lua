@@ -9,87 +9,63 @@
 local VERSION = "0.1"
 
 -- ---------------------------------------------------------------------------
+-- Item name lookup
+-- Hardcoded so we don't depend on GetItemInfo cache being warm.
+-- Verify IDs in-game: /script print(GetItemInfo(itemId))
+-- ---------------------------------------------------------------------------
+
+local ITEM_NAMES = {
+  -- Ores
+  [2770]  = "Copper Ore",
+  [2771]  = "Tin Ore",
+  [2772]  = "Iron Ore",
+  [2776]  = "Gold Ore",
+  [3858]  = "Mithril Ore",
+  [7911]  = "Truesilver Ore",
+  [10620] = "Thorium Ore",
+  -- Bars
+  [2840]  = "Copper Bar",
+  [3576]  = "Tin Bar",
+  [2841]  = "Bronze Bar",
+  [3575]  = "Iron Bar",
+  [3577]  = "Gold Bar",
+  [3860]  = "Mithril Bar",
+  [6037]  = "Truesilver Bar",
+  [12359] = "Thorium Bar",
+  -- Fish
+  [6303]  = "Raw Oily Blackmouth",
+  [13422] = "Stonescale Eel",
+  [13439] = "Raw Nightfin Snapper",
+  [21153] = "Raw Sagefish",
+  -- Cooked outputs
+  [6370]  = "Blackmouth Oil",
+  [13423] = "Stonescale Oil",
+  [13931] = "Nightfin Soup",
+  [21217] = "Sagefish Delight",
+}
+
+-- ---------------------------------------------------------------------------
 -- Recipe data
---
--- All item IDs are standard vanilla 1.12 values and should be verified
--- in-game with: /script print(GetItemInfo(itemId))
---
--- Structure:
---   name    = display name
---   output  = { id = itemId, qty = N }   (qty = how many the craft produces)
---   mats    = { { id = itemId, qty = N }, ... }
 -- ---------------------------------------------------------------------------
 
 CraftArb_Recipes = {
-
   -- Mining: ore -> bars
-  {
-    name   = "Copper Bar",
-    output = { id = 2840, qty = 1 },
-    mats   = { { id = 2770, qty = 2 } },   -- 2x Copper Ore
-  },
-  {
-    name   = "Tin Bar",
-    output = { id = 3576, qty = 1 },
-    mats   = { { id = 2771, qty = 2 } },   -- 2x Tin Ore
-  },
-  {
-    name   = "Bronze Bar",
-    output = { id = 2841, qty = 2 },       -- smelting makes 2 bars
-    mats   = { { id = 2770, qty = 1 },     -- 1x Copper Ore
-               { id = 2771, qty = 1 } },   -- 1x Tin Ore
-  },
-  {
-    name   = "Iron Bar",
-    output = { id = 3575, qty = 1 },
-    mats   = { { id = 2772, qty = 2 } },   -- 2x Iron Ore
-  },
-  {
-    name   = "Gold Bar",
-    output = { id = 3577, qty = 1 },
-    mats   = { { id = 2776, qty = 2 } },   -- 2x Gold Ore
-  },
-  {
-    name   = "Mithril Bar",
-    output = { id = 3860, qty = 1 },
-    mats   = { { id = 3858, qty = 2 } },   -- 2x Mithril Ore
-  },
-  {
-    name   = "Truesilver Bar",
-    output = { id = 6037, qty = 1 },
-    mats   = { { id = 7911, qty = 2 } },   -- 2x Truesilver Ore
-  },
-  {
-    name   = "Thorium Bar",
-    output = { id = 12359, qty = 1 },
-    mats   = { { id = 10620, qty = 2 } },  -- 2x Thorium Ore
-  },
-
+  { name = "Copper Bar",     output = { id = 2840,  qty = 1 }, mats = { { id = 2770,  qty = 2 } } },
+  { name = "Tin Bar",        output = { id = 3576,  qty = 1 }, mats = { { id = 2771,  qty = 2 } } },
+  { name = "Bronze Bar",     output = { id = 2841,  qty = 2 }, mats = { { id = 2770,  qty = 1 }, { id = 2771, qty = 1 } } },
+  { name = "Iron Bar",       output = { id = 3575,  qty = 1 }, mats = { { id = 2772,  qty = 2 } } },
+  { name = "Gold Bar",       output = { id = 3577,  qty = 1 }, mats = { { id = 2776,  qty = 2 } } },
+  { name = "Mithril Bar",    output = { id = 3860,  qty = 1 }, mats = { { id = 3858,  qty = 2 } } },
+  { name = "Truesilver Bar", output = { id = 6037,  qty = 1 }, mats = { { id = 7911,  qty = 2 } } },
+  { name = "Thorium Bar",    output = { id = 12359, qty = 1 }, mats = { { id = 10620, qty = 2 } } },
   -- Cooking: raw fish -> processed outputs
-  {
-    name   = "Blackmouth Oil",
-    output = { id = 6370, qty = 1 },
-    mats   = { { id = 6303, qty = 1 } },   -- 1x Raw Oily Blackmouth
-  },
-  {
-    name   = "Stonescale Oil",
-    output = { id = 13423, qty = 1 },
-    mats   = { { id = 13422, qty = 1 } },  -- 1x Stonescale Eel
-  },
-  {
-    name   = "Nightfin Soup",
-    output = { id = 13931, qty = 1 },
-    mats   = { { id = 13439, qty = 1 } },  -- 1x Raw Nightfin Snapper
-  },
-  {
-    name   = "Sagefish Delight",
-    output = { id = 21217, qty = 1 },
-    mats   = { { id = 21153, qty = 2 } },  -- 2x Raw Sagefish
-  },
+  { name = "Blackmouth Oil",    output = { id = 6370,  qty = 1 }, mats = { { id = 6303,  qty = 1 } } },
+  { name = "Stonescale Oil",    output = { id = 13423, qty = 1 }, mats = { { id = 13422, qty = 1 } } },
+  { name = "Nightfin Soup",     output = { id = 13931, qty = 1 }, mats = { { id = 13439, qty = 1 } } },
+  { name = "Sagefish Delight",  output = { id = 21217, qty = 1 }, mats = { { id = 21153, qty = 2 } } },
 }
 
--- Build a deduplicated list of every item ID we need to scan
--- (called once at init, stored in CraftArb_ScanItems)
+-- Build deduplicated scan list from all recipe item IDs
 function CraftArb_BuildScanList()
   local seen = {}
   CraftArb_ScanItems = {}
@@ -108,15 +84,114 @@ function CraftArb_BuildScanList()
 end
 
 -- ---------------------------------------------------------------------------
+-- Scan state machine (not persisted)
+-- ---------------------------------------------------------------------------
+
+local Scan = {
+  active   = false,
+  queue    = {},   -- item IDs left to query
+  total    = 0,    -- total items at scan start (for progress display)
+  current  = nil,  -- item ID currently being queried
+  timer    = 0,    -- seconds until next query fires
+  waiting  = false, -- true while waiting for AUCTION_ITEM_LIST_UPDATE
+}
+
+function CraftArb_StartScan()
+  if not AuctionFrame or not AuctionFrame:IsShown() then
+    DEFAULT_CHAT_FRAME:AddMessage("|cffff4444CraftArb:|r Open the Auction House first.")
+    CraftArbStatusText:SetText("Open the Auction House first.")
+    return
+  end
+
+  Scan.queue   = {}
+  for _, id in ipairs(CraftArb_ScanItems) do
+    table.insert(Scan.queue, id)
+  end
+  Scan.total   = table.getn(Scan.queue)
+  Scan.active  = true
+  Scan.timer   = 0    -- fire first query immediately
+  Scan.waiting = false
+  Scan.current = nil
+
+  CraftArbStatusText:SetText("Starting scan...")
+  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r Scanning " .. Scan.total .. " items...")
+end
+
+-- Called every frame by CraftArbEventFrame OnUpdate
+function CraftArb_OnUpdate(elapsed)
+  if not Scan.active or Scan.waiting then return end
+
+  Scan.timer = Scan.timer - elapsed
+  if Scan.timer > 0 then return end
+
+  -- All items done?
+  if table.getn(Scan.queue) == 0 then
+    CraftArb_ScanComplete()
+    return
+  end
+
+  -- Pop next item and query AH
+  Scan.current = table.remove(Scan.queue, 1)
+  local name = ITEM_NAMES[Scan.current]
+  if not name then
+    -- Unknown item — skip without delay
+    return
+  end
+
+  local done = Scan.total - table.getn(Scan.queue)
+  CraftArbStatusText:SetText("Scanning " .. done .. "/" .. Scan.total .. ": " .. name)
+  QueryAuctionItems(name, nil, nil, nil, nil, nil, 0, nil, nil)
+  Scan.waiting = true
+end
+
+-- Called when AH returns results for the current query
+function CraftArb_OnAuctionListUpdate()
+  if not Scan.active or not Scan.current then return end
+
+  local itemId = Scan.current
+  local count  = GetNumAuctionItems("list")
+  local minPerUnit = nil
+
+  for i = 1, count do
+    local _, _, stackSize, _, _, _, _, _, buyout = GetAuctionItemInfo("list", i)
+    local link = GetAuctionItemLink("list", i)
+    if link and buyout and buyout > 0 and stackSize and stackSize > 0 then
+      -- Parse item ID from link format: |Hitem:ITEMID:...|h
+      local _, _, linkId = string.find(link, "|Hitem:(%d+):")
+      if tonumber(linkId) == itemId then
+        local perUnit = buyout / stackSize
+        if not minPerUnit or perUnit < minPerUnit then
+          minPerUnit = perUnit
+        end
+      end
+    end
+  end
+
+  if minPerUnit then
+    CraftArbDB.prices[itemId] = { min = minPerUnit, timestamp = time() }
+  end
+
+  -- Wait 1.5s before next query
+  Scan.waiting = false
+  Scan.timer   = 1.5
+end
+
+function CraftArb_ScanComplete()
+  Scan.active  = false
+  Scan.current = nil
+  CraftArbStatusText:SetText("Scan complete! Click Show Deals.")
+  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r Scan complete.")
+end
+
+-- ---------------------------------------------------------------------------
 -- Initialisation
 -- ---------------------------------------------------------------------------
 
 function CraftArb_OnLoad(frame)
-  -- ADDON_LOADED does not exist in vanilla 1.12; use VARIABLES_LOADED instead,
-  -- which fires after SavedVariables are available.
   frame:RegisterEvent("VARIABLES_LOADED")
   frame:RegisterEvent("AUCTION_HOUSE_SHOW")
   frame:RegisterEvent("AUCTION_HOUSE_CLOSED")
+  frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 end
 
 function CraftArb_OnEvent(frame, event)
@@ -126,19 +201,15 @@ function CraftArb_OnEvent(frame, event)
     CraftArb_OnAHShow()
   elseif event == "AUCTION_HOUSE_CLOSED" then
     CraftArb_OnAHClose()
+  elseif event == "AUCTION_ITEM_LIST_UPDATE" then
+    CraftArb_OnAuctionListUpdate()
   end
 end
 
 function CraftArb_Init()
-  if not CraftArbDB then
-    CraftArbDB = {}
-  end
-  if not CraftArbDB.prices then
-    CraftArbDB.prices = {}
-  end
-  if not CraftArbDB.minProfit then
-    CraftArbDB.minProfit = 1000  -- 10 silver default
-  end
+  if not CraftArbDB then CraftArbDB = {} end
+  if not CraftArbDB.prices then CraftArbDB.prices = {} end
+  if not CraftArbDB.minProfit then CraftArbDB.minProfit = 1000 end
 
   CraftArb_BuildScanList()
 
@@ -159,18 +230,24 @@ function CraftArb_SlashCmd(msg)
     CraftArb_TogglePanel()
   elseif msg == "recipes" then
     CraftArb_PrintRecipes()
+  elseif msg == "prices" then
+    CraftArb_PrintPrices()
   elseif msg == "reset" then
     CraftArbDB.prices = {}
     DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r Price history cleared.")
   else
     DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb commands:|r")
     DEFAULT_CHAT_FRAME:AddMessage("  /craftarb          -- toggle panel")
-    DEFAULT_CHAT_FRAME:AddMessage("  /craftarb recipes  -- list all tracked recipes")
+    DEFAULT_CHAT_FRAME:AddMessage("  /craftarb recipes  -- list tracked recipes")
+    DEFAULT_CHAT_FRAME:AddMessage("  /craftarb prices   -- dump saved prices")
     DEFAULT_CHAT_FRAME:AddMessage("  /craftarb reset    -- clear saved prices")
   end
 end
 
--- Print all recipes to chat for verification
+-- ---------------------------------------------------------------------------
+-- Debug helpers
+-- ---------------------------------------------------------------------------
+
 function CraftArb_PrintRecipes()
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb recipes (" .. table.getn(CraftArb_Recipes) .. "):|r")
   for _, r in ipairs(CraftArb_Recipes) do
@@ -179,13 +256,29 @@ function CraftArb_PrintRecipes()
       matStr = matStr .. mat.qty .. "x[" .. mat.id .. "]"
       if i < table.getn(r.mats) then matStr = matStr .. " + " end
     end
-    DEFAULT_CHAT_FRAME:AddMessage(
-      "  " .. r.name ..
-      " -- " .. matStr ..
-      " -> " .. r.output.qty .. "x[" .. r.output.id .. "]"
-    )
+    DEFAULT_CHAT_FRAME:AddMessage("  " .. r.name .. " -- " .. matStr .. " -> " .. r.output.qty .. "x[" .. r.output.id .. "]")
   end
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00" .. table.getn(CraftArb_ScanItems) .. " unique items to scan.|r")
+end
+
+-- Print all saved prices to chat for debugging
+function CraftArb_PrintPrices()
+  local count = 0
+  for id, data in pairs(CraftArbDB.prices) do
+    local name = ITEM_NAMES[id] or ("Item " .. id)
+    local gold   = math.floor(data.min / 10000)
+    local silver = math.floor((data.min % 10000) / 100)
+    local copper = math.floor(data.min % 100)
+    DEFAULT_CHAT_FRAME:AddMessage(
+      string.format("  %s: %dg %ds %dc", name, gold, silver, copper)
+    )
+    count = count + 1
+  end
+  if count == 0 then
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r No prices saved yet. Run a scan first.")
+  else
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r " .. count .. " prices saved.")
+  end
 end
 
 -- ---------------------------------------------------------------------------
@@ -209,23 +302,27 @@ function CraftArb_OnAHShow()
 end
 
 function CraftArb_OnAHClose()
-  CraftArbStatusText:SetText("Auction House closed.")
+  if Scan.active then
+    Scan.active  = false
+    Scan.waiting = false
+    CraftArbStatusText:SetText("Scan cancelled — AH closed.")
+    DEFAULT_CHAT_FRAME:AddMessage("|cffff4444CraftArb:|r Scan cancelled — AH closed.")
+  else
+    CraftArbStatusText:SetText("Auction House closed.")
+  end
 end
 
 -- ---------------------------------------------------------------------------
--- Stub: scan entry point (wired to the Scan button)
--- ---------------------------------------------------------------------------
-
-function CraftArb_StartScan()
-  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r Scan not yet implemented.")
-  CraftArbStatusText:SetText("Scan not yet implemented.")
-end
-
--- ---------------------------------------------------------------------------
--- Stub: show deals (wired to the Show Deals button)
+-- Show Deals (stub — profit calc comes in next stage)
 -- ---------------------------------------------------------------------------
 
 function CraftArb_ShowDeals()
-  DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r No scan data yet.")
-  CraftArbStatusText:SetText("No scan data. Run a scan first.")
+  local count = 0
+  for _ in pairs(CraftArbDB.prices) do count = count + 1 end
+  if count == 0 then
+    CraftArbStatusText:SetText("No scan data. Run a scan first.")
+  else
+    CraftArbStatusText:SetText("Deals coming soon! (" .. count .. " prices stored)")
+    DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r " .. count .. " prices stored. Use /craftarb prices to inspect.")
+  end
 end
