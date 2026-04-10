@@ -2,7 +2,7 @@
 -- Crafting arbitrage scanner for TurtleWoW (vanilla 1.12)
 
 -- CraftArbDB = {
---   prices = {},          -- [itemId] = { min = N, timestamp = N }
+--   prices = {},          -- [itemId] = { min = N }
 --   minProfit = 1000,     -- minimum net profit to show (in copper)
 -- }
 
@@ -92,8 +92,8 @@ CraftArb_Scan = {
   queue    = {},   -- item IDs left to query
   total    = 0,    -- total items at scan start (for progress display)
   current  = nil,  -- item ID currently being queried
-  timer    = 0,    -- seconds until next query fires
   waiting  = false, -- true while waiting for AUCTION_ITEM_LIST_UPDATE
+  queryTime = 0,   -- GetTime() when last query was sent (for timeout)
 }
 
 function CraftArb_StartScan()
@@ -103,15 +103,15 @@ function CraftArb_StartScan()
     return
   end
 
-  CraftArb_Scan.queue   = {}
+  CraftArb_Scan.queue     = {}
   for _, id in ipairs(CraftArb_ScanItems) do
     table.insert(CraftArb_Scan.queue, id)
   end
-  CraftArb_Scan.total   = table.getn(CraftArb_Scan.queue)
-  CraftArb_Scan.active  = true
-  CraftArb_Scan.timer   = 0    -- fire first query immediately
-  CraftArb_Scan.waiting = false
-  CraftArb_Scan.current = nil
+  CraftArb_Scan.total    = table.getn(CraftArb_Scan.queue)
+  CraftArb_Scan.active   = true
+  CraftArb_Scan.waiting  = false
+  CraftArb_Scan.current  = nil
+  CraftArb_Scan.queryTime = 0
 
   CraftArbStatusText:SetText("Starting scan...")
   DEFAULT_CHAT_FRAME:AddMessage("|cff00ff00CraftArb:|r Scanning " .. CraftArb_Scan.total .. " items...")
@@ -119,10 +119,19 @@ end
 
 -- Called every frame by CraftArbEventFrame OnUpdate
 function CraftArb_OnUpdate(elapsed)
-  if not CraftArb_Scan.active or CraftArb_Scan.waiting then return end
+  if not CraftArb_Scan.active then return end
 
-  CraftArb_Scan.timer = CraftArb_Scan.timer - elapsed
-  if CraftArb_Scan.timer > 0 then return end
+  -- If waiting for results, check for timeout (10s)
+  if CraftArb_Scan.waiting then
+    if GetTime() - CraftArb_Scan.queryTime > 10 then
+      -- Timed out waiting - skip this item and move on
+      DEFAULT_CHAT_FRAME:AddMessage("|cffff4444CraftArb:|r Timeout on item " .. (CraftArb_Scan.current or "?") .. ", skipping.")
+      CraftArb_Scan.waiting = false
+      CraftArb_Scan.current = nil
+    else
+      return
+    end
+  end
 
   -- All items done?
   if table.getn(CraftArb_Scan.queue) == 0 then
@@ -130,18 +139,23 @@ function CraftArb_OnUpdate(elapsed)
     return
   end
 
+  -- Wait until server is ready for next query
+  if not CanSendAuctionQuery() then return end
+
   -- Pop next item and query AH
   CraftArb_Scan.current = table.remove(CraftArb_Scan.queue, 1)
   local name = CraftArb_ItemNames[CraftArb_Scan.current]
   if not name then
-    -- Unknown item - skip without delay
+    -- Unknown item - skip immediately
+    CraftArb_Scan.current = nil
     return
   end
 
   local done = CraftArb_Scan.total - table.getn(CraftArb_Scan.queue)
   CraftArbStatusText:SetText("Scanning " .. done .. "/" .. CraftArb_Scan.total .. ": " .. name)
   QueryAuctionItems(name, nil, nil, nil, nil, nil, 0, nil, nil)
-  CraftArb_Scan.waiting = true
+  CraftArb_Scan.waiting   = true
+  CraftArb_Scan.queryTime = GetTime()
 end
 
 -- Called when AH returns results for the current query
@@ -168,12 +182,11 @@ function CraftArb_OnAuctionListUpdate()
   end
 
   if minPerUnit then
-    CraftArbDB.prices[itemId] = { min = minPerUnit, timestamp = time() }
+    CraftArbDB.prices[itemId] = { min = minPerUnit }
   end
 
-  -- Wait 1.5s before next query
   CraftArb_Scan.waiting = false
-  CraftArb_Scan.timer   = 1.5
+  CraftArb_Scan.current = nil
 end
 
 function CraftArb_ScanComplete()
