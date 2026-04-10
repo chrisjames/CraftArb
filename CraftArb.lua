@@ -243,6 +243,7 @@ function CraftArb_Init()
   if not CraftArbDB.minProfit then CraftArbDB.minProfit = 1000 end
 
   CraftArb_BuildScanList()
+  CraftArb_SetupHeaders()
 
   SLASH_CRAFTARB1 = "/craftarb"
   SLASH_CRAFTARB2 = "/carb"
@@ -421,6 +422,26 @@ function CraftArb_CalcDeals()
   end)
 
   return deals
+end
+
+-- ---------------------------------------------------------------------------
+-- Column headers (created once in CraftArb_Init)
+-- ---------------------------------------------------------------------------
+
+function CraftArb_SetupHeaders()
+  local cols = {
+    { label = "Recipe",     x = 0,   width = 156, justify = "LEFT"  },
+    { label = "Mat Cost",   x = 156, width = 76,  justify = "RIGHT" },
+    { label = "Sell Price", x = 234, width = 76,  justify = "RIGHT" },
+    { label = "Profit",     x = 312, width = 76,  justify = "RIGHT" },
+  }
+  for _, col in ipairs(cols) do
+    local f = CraftArbHeaderRow:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+    f:SetWidth(col.width)
+    f:SetPoint("LEFT", CraftArbHeaderRow, "LEFT", col.x, 0)
+    f:SetJustifyH(col.justify)
+    f:SetText(col.label)
+  end
 end
 
 -- ---------------------------------------------------------------------------
