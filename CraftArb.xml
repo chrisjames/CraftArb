@@ -3,7 +3,9 @@
    xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 
   <!-- Invisible event listener frame, created at startup -->
-  <Frame name="CraftArbEventFrame" hidden="true">
+  <!-- Event/timer frame: NOT hidden so OnUpdate fires; zero size so it's invisible -->
+  <Frame name="CraftArbEventFrame">
+    <Size><AbsDimension x="0" y="0"/></Size>
     <Scripts>
       <OnLoad>
         CraftArb_OnLoad(this)
