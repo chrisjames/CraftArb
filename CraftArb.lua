@@ -134,7 +134,7 @@ function CraftArb_OnUpdate(elapsed)
   Scan.current = table.remove(Scan.queue, 1)
   local name = ITEM_NAMES[Scan.current]
   if not name then
-    -- Unknown item — skip without delay
+    -- Unknown item - skip without delay
     return
   end
 
@@ -305,15 +305,15 @@ function CraftArb_OnAHClose()
   if Scan.active then
     Scan.active  = false
     Scan.waiting = false
-    CraftArbStatusText:SetText("Scan cancelled — AH closed.")
-    DEFAULT_CHAT_FRAME:AddMessage("|cffff4444CraftArb:|r Scan cancelled — AH closed.")
+    CraftArbStatusText:SetText("Scan cancelled - AH closed.")
+    DEFAULT_CHAT_FRAME:AddMessage("|cffff4444CraftArb:|r Scan cancelled - AH closed.")
   else
     CraftArbStatusText:SetText("Auction House closed.")
   end
 end
 
 -- ---------------------------------------------------------------------------
--- Show Deals (stub — profit calc comes in next stage)
+-- Show Deals (stub - profit calc comes in next stage)
 -- ---------------------------------------------------------------------------
 
 function CraftArb_ShowDeals()
