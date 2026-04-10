@@ -17,7 +17,7 @@ local VERSION = "0.1"
 CraftArb_ItemNames = {
   -- Fish
   [13439] = "Raw Nightfin Snapper",
-  [21153] = "Raw Sagefish",
+  [21154] = "Raw Greater Sagefish",  -- verify in-game: /script print(GetItemInfo(21154))
   -- Cooked outputs
   [13931] = "Nightfin Soup",
   [21217] = "Sagefish Delight",
@@ -27,10 +27,14 @@ CraftArb_ItemNames = {
 -- Recipe data
 -- ---------------------------------------------------------------------------
 
+-- vendorCost: total copper cost of vendor-bought reagents per craft (applied at calc time).
 CraftArb_Recipes = {
   -- Cooking: raw fish -> processed outputs
-  { name = "Nightfin Soup",    output = { id = 13931, qty = 1 }, mats = { { id = 13439, qty = 1 } } },
-  { name = "Sagefish Delight", output = { id = 21217, qty = 1 }, mats = { { id = 21153, qty = 2 } } },
+  -- Nightfin Soup: 1x Raw Nightfin Snapper + 1x Refreshing Spring Water (4c vendor)
+  { name = "Nightfin Soup",    output = { id = 13931, qty = 1 }, mats = { { id = 13439, qty = 1 } }, vendorCost = 4  },
+  -- Sagefish Delight: 1x Raw Greater Sagefish + 1x Hot Spices (36c vendor)
+  -- verify in-game: /script print(GetItemInfo(21154))
+  { name = "Sagefish Delight", output = { id = 21217, qty = 1 }, mats = { { id = 21154, qty = 1 } }, vendorCost = 36 },
 }
 
 -- Build deduplicated scan list from all recipe item IDs
@@ -353,6 +357,7 @@ function CraftArb_CalcDeals()
         break
       end
     end
+    matCost = matCost + (recipe.vendorCost or 0)
 
     local outP = CraftArbDB.prices[recipe.output.id]
     if outP and outP.min then hasOutput = true end
