@@ -207,12 +207,32 @@ function CraftArb_OnEvent(frame, event)
   end
 end
 
+-- ---------------------------------------------------------------------------
+-- Layout: position content frames in Lua so relative anchors are resolved
+-- at runtime (more reliable than XML sibling-relative anchors in 1.12).
+-- ---------------------------------------------------------------------------
+
+function CraftArb_Layout()
+  -- Status bar: 20px below the top chrome of UI-DialogBox-Border
+  CraftArbStatusFrame:ClearAllPoints()
+  CraftArbStatusFrame:SetPoint("TOPLEFT", CraftArbFrame, "TOPLEFT", 20, -30)
+
+  -- Column headers: 12px gap below status frame
+  CraftArbHeaderRow:ClearAllPoints()
+  CraftArbHeaderRow:SetPoint("TOPLEFT", CraftArbStatusFrame, "BOTTOMLEFT", 0, -12)
+
+  -- Deals rows area: 8px gap below header
+  CraftArbDealsArea:ClearAllPoints()
+  CraftArbDealsArea:SetPoint("TOPLEFT", CraftArbHeaderRow, "BOTTOMLEFT", 0, -8)
+end
+
 function CraftArb_Init()
   if not CraftArbDB then CraftArbDB = {} end
   if not CraftArbDB.prices then CraftArbDB.prices = {} end
   if not CraftArbDB.minProfit then CraftArbDB.minProfit = 1000 end
 
   CraftArb_BuildScanList()
+  CraftArb_Layout()
   CraftArb_SetupHeaders()
 
   SLASH_CRAFTARB1 = "/craftarb"

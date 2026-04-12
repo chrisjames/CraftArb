@@ -65,12 +65,9 @@
         </Scripts>
       </Button>
 
-      <!-- Status text                                              -->
-      <!-- x=20 clears the ~18px left chrome of UI-DialogBox-Border -->
-      <!-- y=-32 clears the ~30px top chrome                         -->
+      <!-- Status text (positioned by Lua in CraftArb_Layout) -->
       <Frame name="CraftArbStatusFrame" parent="CraftArbFrame">
         <Size><AbsDimension x="380" y="20"/></Size>
-        <Anchors><Anchor point="TOPLEFT" x="20" y="-32"/></Anchors>
         <Layers>
           <Layer level="ARTWORK">
             <FontString name="CraftArbStatusText" inherits="GameFontNormalSmall"
@@ -81,18 +78,14 @@
         </Layers>
       </Frame>
 
-      <!-- Column headers                                            -->
-      <!-- y=-62: status top(-32) + status height(20) + gap(10) = 62 -->
+      <!-- Column headers (positioned by Lua in CraftArb_Layout) -->
       <Frame name="CraftArbHeaderRow" parent="CraftArbFrame">
         <Size><AbsDimension x="388" y="20"/></Size>
-        <Anchors><Anchor point="TOPLEFT" x="20" y="-62"/></Anchors>
       </Frame>
 
-      <!-- Deals list area (rows created dynamically from Lua)       -->
-      <!-- y=-90: header top(-62) + header height(20) + gap(8) = 90  -->
+      <!-- Deals list area (positioned by Lua in CraftArb_Layout) -->
       <Frame name="CraftArbDealsArea" parent="CraftArbFrame">
         <Size><AbsDimension x="388" y="185"/></Size>
-        <Anchors><Anchor point="TOPLEFT" x="20" y="-90"/></Anchors>
       </Frame>
 
       <!-- Scan button -->
