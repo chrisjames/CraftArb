@@ -409,7 +409,7 @@ function CraftArb_SetupHeaders()
   for _, col in ipairs(cols) do
     local f = CraftArbHeaderRow:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     f:SetWidth(col.width)
-    f:SetPoint("LEFT", CraftArbHeaderRow, "LEFT", col.x, 0)
+    f:SetPoint("TOPLEFT", CraftArbHeaderRow, "TOPLEFT", col.x, -4)
     f:SetJustifyH(col.justify)
     f:SetText(col.label)
   end
@@ -425,31 +425,31 @@ function CraftArb_GetRow(index)
   if CraftArb_DealsRows[index] then return CraftArb_DealsRows[index] end
 
   local row = CreateFrame("Frame", nil, CraftArbDealsArea)
-  row:SetHeight(16)
+  row:SetHeight(20)
   row:SetWidth(388)
-  row:SetPoint("TOPLEFT", CraftArbDealsArea, "TOPLEFT", 0, -(index - 1) * 16)
+  row:SetPoint("TOPLEFT", CraftArbDealsArea, "TOPLEFT", 0, -(index - 1) * 20)
 
   local nameText = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
   nameText:SetWidth(156)
-  nameText:SetPoint("LEFT", row, "LEFT", 0, 0)
+  nameText:SetPoint("TOPLEFT", row, "TOPLEFT", 0, -4)
   nameText:SetJustifyH("LEFT")
   row.nameText = nameText
 
   local matText = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
   matText:SetWidth(76)
-  matText:SetPoint("LEFT", row, "LEFT", 156, 0)
+  matText:SetPoint("TOPLEFT", row, "TOPLEFT", 156, -4)
   matText:SetJustifyH("RIGHT")
   row.matText = matText
 
   local sellText = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
   sellText:SetWidth(76)
-  sellText:SetPoint("LEFT", row, "LEFT", 234, 0)
+  sellText:SetPoint("TOPLEFT", row, "TOPLEFT", 234, -4)
   sellText:SetJustifyH("RIGHT")
   row.sellText = sellText
 
   local profitText = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
   profitText:SetWidth(76)
-  profitText:SetPoint("LEFT", row, "LEFT", 312, 0)
+  profitText:SetPoint("TOPLEFT", row, "TOPLEFT", 312, -4)
   profitText:SetJustifyH("RIGHT")
   row.profitText = profitText
 

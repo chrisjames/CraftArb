@@ -81,14 +81,15 @@
 
       <!-- Column headers (populated by Lua in CraftArb_SetupHeaders) -->
       <Frame name="CraftArbHeaderRow" parent="CraftArbFrame">
-        <Size><AbsDimension x="388" y="16"/></Size>
+        <Size><AbsDimension x="388" y="20"/></Size>
         <Anchors><Anchor point="TOPLEFT" x="16" y="-44"/></Anchors>
       </Frame>
 
       <!-- Deals list area (rows created dynamically from Lua) -->
+      <!-- Top at y=-72: header top(-44) + header height(20) + gap(8) = 72 -->
       <Frame name="CraftArbDealsArea" parent="CraftArbFrame">
         <Size><AbsDimension x="388" y="200"/></Size>
-        <Anchors><Anchor point="TOPLEFT" x="16" y="-64"/></Anchors>
+        <Anchors><Anchor point="TOPLEFT" x="16" y="-72"/></Anchors>
       </Frame>
 
       <!-- Scan button -->
